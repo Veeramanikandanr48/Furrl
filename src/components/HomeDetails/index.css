@@ -1,0 +1,104 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
+@media only screen and (max-width: 768px) {
+  .banner {
+    background-image: url("https://cdn.furrl.in/vibes/VibeCard_HomeHunts.jpg");
+    background-size: cover;
+    width: 100vw;
+    height: 27vh;
+    max-height: 220px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+
+  .banner-heading {
+    color: #fff;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 26px;
+    letter-spacing: 1px;
+    font-family: Montserrat, sans-serif;
+    filter: drop-shadow(4px 4px 4px #000);
+    margin-bottom: 10px;
+  }
+
+  .products-wrapper {
+    padding: 10px;
+    padding-top: 5px;
+  }
+
+  .title {
+    font-weight: 600;
+    font-family: sans-serif;
+    display: flex;
+  }
+
+  .count {
+    font-style: italic;
+    color: grey;
+    font-weight: normal;
+    font-size: 14px;
+    margin-left: 5px;
+  }
+
+  .filter-tabs {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    font-family: Montserrat, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: #000;
+    border: 1px solid rgb(210, 208, 208);
+    border-radius: 15px;
+    padding: 4px 10px;
+    text-align: center;
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+
+  .active-tab {
+    color: #fff;
+    background-color: #7e59e7;
+    border: none;
+  }
+
+  .products-list {
+    list-style-type: none;
+    padding: 4px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin: 0;
+  }
+
+  .dot {
+    border: 3px solid grey;
+    border-radius: 4px;
+    height: 4px;
+    width: 4px;
+    align-self: center;
+    opacity: 0.4;
+    margin-left: 4px;
+  }
+}
+
+/* Hide everything on larger screens */
+@media only screen and (min-width: 769px) {
+  body {
+    display: none;
+  }
+}

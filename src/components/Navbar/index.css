@@ -1,0 +1,27 @@
+.navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 8vh;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
+  transition: 0.4s;
+  z-index: 1;
+}
+
+.navbar-icons-container {
+  position: absolute;
+  right: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.navbar-icon {
+  margin-top: 5px;
+  font-size: 20px;
+  margin-left: 15px;
+  color: #000;
+}
