@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import "./index.css";
 import CategoryFilters from "../../components/CategoryFilters";
@@ -7,7 +7,7 @@ import LoadingSpinner from "../../components/Loader";
 
 const initialProductState = {
   page: 0,
-  pageSize: 0,
+  pageSize: 10,
   totalPages: 10,
   totalProducts: 0,
   products: [],
@@ -15,27 +15,37 @@ const initialProductState = {
 
 const HomeDetails = () => {
   const [productData, setProductData] = useState(initialProductState);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [hasReachedEnd, setHasReachedEnd] = useState(false);
   const [filterOptions, setFilterOptions] = useState([]);
   const [activeFilter, setActiveFilter] = useState(null);
 
-  const handleScroll = useCallback(() => {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 20) {
-      if (!hasReachedEnd) setHasReachedEnd(true);
-    }
-  }, [hasReachedEnd]);
-
   useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 20) {
+        if (!hasReachedEnd) setHasReachedEnd(true);
+      }
+    };
+
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        window.location.href = "https://info.furrl.in/";
+      }
+    };
+
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
+    window.addEventListener("resize", handleResize);
 
-  useEffect(() => {
+    // Perform initial check
     if (window.innerWidth > 768) {
       window.location.href = "https://info.furrl.in/";
     }
-  }, []);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [hasReachedEnd]);
 
   const handleFilterChange = (filter) => {
     setProductData(initialProductState);
@@ -43,15 +53,15 @@ const HomeDetails = () => {
     setHasReachedEnd(false);
   };
 
-  const fetchProductData = useCallback(async () => {
-    if (productData.page < productData.totalPages) {
+  const fetchProductData = async (page, activeFilter) => {
+    if (page < productData.totalPages) {
       setIsLoading(true);
 
       const url = "https://api.furrl.in/api/v2/listing/getListingProducts";
       const requestBody = {
         input: {
-          page: productData.page + 1,
-          pageSize: 10,
+          page: page + 1,
+          pageSize: productData.pageSize,
           filters: activeFilter ? { id: activeFilter.uniqueId, type: activeFilter.contentType } : [],
           id: "#HomeHunts",
           entity: "vibe",
@@ -61,9 +71,10 @@ const HomeDetails = () => {
       try {
         const response = await axios.post(url, requestBody);
         const data = response.data;
-        setProductData(prevData => ({
+        setProductData((prevData) => ({
           ...data.data.getListingProducts,
           products: [...prevData.products, ...data.data.getListingProducts.products],
+          page: page + 1,
         }));
         setHasReachedEnd(false);
       } catch (error) {
@@ -72,9 +83,9 @@ const HomeDetails = () => {
         setIsLoading(false);
       }
     }
-  }, [productData, activeFilter]);
+  };
 
-  const fetchFilterOptions = useCallback(async () => {
+  const fetchFilterOptions = async () => {
     const url = "https://api.furrl.in/api/v2/listing/getListingFilters";
     const requestBody = {
       id: "#HomeHunts",
@@ -88,25 +99,28 @@ const HomeDetails = () => {
     } catch (error) {
       console.error("Error fetching filters:", error);
     }
+  };
+
+  useEffect(() => {
+    fetchFilterOptions();
   }, []);
+
+  useEffect(() => {
+    setProductData(initialProductState); // Reset product data when filter changes
+    fetchProductData(0, activeFilter); // Fetch new products based on the active filter
+  }, [activeFilter]);
+
+  useEffect(() => {
+    if (hasReachedEnd) {
+      fetchProductData(productData.page, activeFilter);
+    }
+  }, [hasReachedEnd, productData.page, activeFilter]);
 
   const renderProductItems = () => {
     return productData.products.map((product, index) => (
       <ProductItems key={product.id} item={product} index={index} />
     ));
   };
-
-  useEffect(() => {
-    if (hasReachedEnd) fetchProductData();
-  }, [hasReachedEnd, fetchProductData]);
-
-  useEffect(() => {
-    fetchProductData();
-  }, [activeFilter, fetchProductData]);
-
-  useEffect(() => {
-    fetchFilterOptions();
-  }, [fetchFilterOptions]);
 
   return (
     <>
@@ -125,7 +139,7 @@ const HomeDetails = () => {
           >
             All
           </li>
-          {filterOptions.map(option => (
+          {filterOptions.map((option) => (
             <CategoryFilters
               key={option.uniqueId}
               item={option}
